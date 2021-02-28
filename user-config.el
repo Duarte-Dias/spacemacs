@@ -1,3 +1,5 @@
+(spacemacs|disable-company org-mode)
+
 (set-face-attribute 'header-line nil
                     :weight 'light
                     :overline nil
@@ -26,13 +28,7 @@
 
  ;; (setq-default mode-line-format nil)
 
-; set s-T to terminal
-(exwm-input-set-key (kbd "s-t") 'spacemacs/default-pop-shell)
-
-(exwm-input-set-key (kbd "s-r") #'counsel-linux-app)
-
-(exwm-input-set-key (kbd "s-f") #'exwm-floating-toggle-floating)
-
+(setq visual-fill-column-center-text t)
 (with-eval-after-load 'org
  (add-hook 'org-mode-hook 'visual-fill-column-mode)
  (add-hook 'org-mode-hook 'visual-line-mode)
@@ -40,8 +36,29 @@
  (setq org-startup-indented t)
 
  (setq org-image-actual-width nil)
+ (setq org-fontify-done-headline t)
 
  )
+
+(defun my/gtd-view ()
+  "Launch the gtd view, containing gtd.org, inbox.org and the agenda"
+  (interactive)
+  (progn
+    (delete-other-windows)
+    (find-file "~/org/gtd.org")
+    (let (oldVal org-agenda-window-setup)
+      (setq org-agenda-window-setup `current-window)
+      (split-window-right-and-focus)
+      (org-agenda-list)
+      (setq org-agenda-window-setup oldVal)
+      )
+    (windmove-left)
+    (split-window-below -10)
+    (windmove-down)
+    (find-file "~/org/inbox.org")
+    (windmove-up)
+    )
+  )
 
 (require 'quelpa)
 (let ((default-directory  "~/.emacs.d/.cache/quelpa/build/"))
@@ -56,7 +73,6 @@
     (defvar musicplayer--update-metadata-every 2 "Fetch current song every x seconds")
     (defun musicplayer-update-metadata ()
       "Update `musicplayer--metadata` variable"
-      (message "using yes using")
       (setq musicplayer-metadata
             (replace-regexp-in-string
              "\n$" ""
@@ -91,3 +107,34 @@
   (setq mini-modeline-right-padding 3) ;; need some space
   (mini-modeline-mode t)
   )
+
+;; set s-T to terminal
+(exwm-input-set-key (kbd "s-t") 'terminal-here)
+
+(exwm-input-set-key (kbd "s-r") 'counsel-linux-app)
+
+(exwm-input-set-key (kbd "s-f") 'exwm-floating-toggle-floating)
+(exwm-input-set-key (kbd "s-w g") 'my/gtd-view)
+
+(setq myposframe-params 
+      '((parent-frame nil)
+       (left-fringe . 8)
+       (right-fringe . 8)
+       ))
+
+  (use-package ivy-posframe
+    :ensure t
+    :custom
+    (ivy-posframe-parameters myposframe-params)
+    (ivy-posframe-display-functions-alist 
+     '((t . ivy-posframe-display-at-frame-center)))
+    :config
+    (ivy-posframe-mode 1)
+    )
+  (use-package which-key-posframe
+    :ensure t
+    :custom
+    (which-key-posframe-parameters myposframe-params)
+    :config
+    (which-key-posframe-mode)
+    )

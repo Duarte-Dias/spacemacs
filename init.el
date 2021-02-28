@@ -29,14 +29,21 @@ values."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(html
+   '(haskell
+     python
+     go
+     lua
+     html
      javascript
      tern
      pdf
      (exwm :variables
            exwm-enable-systray t
      )
-     shell
+
+     lsp
+     (c-c++ :variables
+            c-c++-enable-clang-support t)
      (org :variables
           org-enable-roam-support t)
      ;; ----------------------------------------------------------------
@@ -48,11 +55,17 @@ values."
      ;; helm
      ivy
 
-     auto-completion
+     (auto-completion
+      :disabled-for org spacemacs-org git
+      :variables
+      auto-completion-enable-help-tooltip t)
+
      ocaml
-     ( spell-checking :variables
-                      spell-checking-enable-auto-dictionary t
-     )
+
+     ;; it sucks cuz it navs through file and also consantly says "spell-checking complete"
+     ;;( spell-checking :variables
+     ;;                 spell-checking-enable-auto-dictionary t
+     ;;)
      ;; better-defaults
      emacs-lisp
      git
@@ -63,8 +76,8 @@ values."
      ;;    shell-default-height 30
      ;;     shell-default-shell 'ansi-term
      ;;     shell-default-position 'bottom)
+     shell
 
-     ;; spell-checking
      syntax-checking
      ;; version-control
     )
@@ -76,6 +89,9 @@ values."
    '(
      ; custom desktop-environment used in exwm
      ;(desktop-environment :location local)
+     ivy-posframe
+     which-key-posframe
+     modus-themes
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -148,7 +164,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '((mini :location local))
+   dotspacemacs-themes '(modus-operandi)
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
    ;; first three are spaceline themes. `doom' is the doom-emacs mode-line.
@@ -332,6 +348,8 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+  ;; Before EVIL is loaded ...
+  (setq evil-respect-visual-line-mode t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -380,17 +398,24 @@ This function is called at the very end of Spacemacs initialization."
  '(completion-on-separator-character t)
  '(custom-safe-themes
    (quote
-    ("f7a2ee7c491080e007ad4c37b6334a6ee974cd9646dd732d259b98dabf661399" "cda6f730f6c2358365fb9a1ceb9c9e4ea7c7eedf50b540b4f8044b0e25564645" "51418f29f69d3b11fdc8028f5f544d643264c71ea30033d60b65e8bf24ac4d88" "c1b4855187401165f09c72f945f8a596dfc23f7863da728b3b1c8eb5f1934a8b" "1efbd7b7cea3f9718a3568df76af3f8d9eb02d2ec22649ef1008ee60e31d9617" "17b5207b1963525972d697a59ad4d4fc063022d5842c22fa71e72bcec0de8a43" "66475b6e9f518cdd5c0d72097cb36f8f9097920846e2d0fb37d87a77a5c97a94" "6dd304f5db0614cb84760250a15b08d6a0999b4b410c98b524de3db4352e25d1" "3a90942750db487d922d23afe96c2bf8cedf688e532a220b3146e5b9b8e502b2" "4cb6851a975494de2e3584a3adb93d91f64de159f2f97e867b6c876bf5f9283f" "213b1b29eea2ca03f4c76b304c4d3be832a4a96771df1f4c2883a7bc24f70dbc" "bbe4563ee4d69172dd9b4a8f2c988160db455266dd832ade88fc154ff4dc48a0" "613496e47148bb291bef4ed1d3d0e4e00adc4ea2c646140eb2793fa35c28d6bf" "c0528f30f761a787fd63a1a5227f3da75e367bb0f4fb2be7134373789cde44bd" "a4417b5ecc0c0b8df3768281a1221e98fd7ecc41e4f78a86c22f8a34c85a931a" "2a44c9ee42f1c5a1229226d5575b8b517858b1d1930fa66aa304ddbc352f894b" "97d46d28fc1af7736ccd39749e06ea8f36b2a66dd59336726f57314951301fb5" "47e41c2c6521e99853d1d20bd0078b4160e86f7efef0b0143d421b9ad6fb2488" "cd9c9255199e90a32b842a41bcad7d358ea5fea88a7c970b9970771741144980" "f8344809d38a17bececf7603dee71d16e94a402305654a6587068e2e4dff16a3" "92e9030d8ae441b296b05fe77fda386f114497c0ac3c6e6f0d72994571a37c6d" "3813a93c0df5b1b179e32ec8a957f94b767c608328f610f6a0f5eeabd47ed1a3" "cab317d0125d7aab145bc7ee03a1e16804d5abdfa2aa8738198ac30dc5f7b569" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" "801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "cc0dbb53a10215b696d391a90de635ba1699072745bf653b53774706999208e3" "3e335d794ed3030fefd0dbd7ff2d3555e29481fe4bbb0106ea11c660d6001767" "4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9" "630024becb5673348927e7cd480daf257725ad5e5898fe2717d041c400b0b939" "bf76c06f117e7fdfa7b70acccc0484844afe4bef53769279a17654246aba826f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+    ("f2927d7d87e8207fa9a0a003c0f222d45c948845de162c885bf6ad2a255babfd" "e3c64e88fec56f86b49dcdc5a831e96782baf14b09397d4057156b17062a8848" "e27556a94bd02099248b888555a6458d897e8a7919fd64278d1f1e8784448941" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "a5d04a184d259f875e3aedbb6dbbe8cba82885d66cd3cf9482a5969f44f606c0" "3c1e3bde65e5c43920b53f90aeded68da40b32bcb912acc9f9f57e6cebbbe817" "c3e1abf81218d23b4238610cf961d608133f6708b207d91e7b7f0b68b39d9e6d" "0f04bee9bd430053af588e240c94c5ca14799de2620dac25516829624d943b7f" "d444e5b6f78ba173def729c644c1cd7ba129cf2b8ea3a83bd059c8e9a322fc72" "b42bca6a7b9cd02c6c235031a65ced73373d366a2f91e54c041fb3833f62292a" "7816634b8cfe30c5b3d316419a87f7ff6608a1ac28702a5844f8f6c7805de44b" "f7a2ee7c491080e007ad4c37b6334a6ee974cd9646dd732d259b98dabf661399" "cda6f730f6c2358365fb9a1ceb9c9e4ea7c7eedf50b540b4f8044b0e25564645" "51418f29f69d3b11fdc8028f5f544d643264c71ea30033d60b65e8bf24ac4d88" "c1b4855187401165f09c72f945f8a596dfc23f7863da728b3b1c8eb5f1934a8b" "1efbd7b7cea3f9718a3568df76af3f8d9eb02d2ec22649ef1008ee60e31d9617" "17b5207b1963525972d697a59ad4d4fc063022d5842c22fa71e72bcec0de8a43" "66475b6e9f518cdd5c0d72097cb36f8f9097920846e2d0fb37d87a77a5c97a94" "6dd304f5db0614cb84760250a15b08d6a0999b4b410c98b524de3db4352e25d1" "3a90942750db487d922d23afe96c2bf8cedf688e532a220b3146e5b9b8e502b2" "4cb6851a975494de2e3584a3adb93d91f64de159f2f97e867b6c876bf5f9283f" "213b1b29eea2ca03f4c76b304c4d3be832a4a96771df1f4c2883a7bc24f70dbc" "bbe4563ee4d69172dd9b4a8f2c988160db455266dd832ade88fc154ff4dc48a0" "613496e47148bb291bef4ed1d3d0e4e00adc4ea2c646140eb2793fa35c28d6bf" "c0528f30f761a787fd63a1a5227f3da75e367bb0f4fb2be7134373789cde44bd" "a4417b5ecc0c0b8df3768281a1221e98fd7ecc41e4f78a86c22f8a34c85a931a" "2a44c9ee42f1c5a1229226d5575b8b517858b1d1930fa66aa304ddbc352f894b" "97d46d28fc1af7736ccd39749e06ea8f36b2a66dd59336726f57314951301fb5" "47e41c2c6521e99853d1d20bd0078b4160e86f7efef0b0143d421b9ad6fb2488" "cd9c9255199e90a32b842a41bcad7d358ea5fea88a7c970b9970771741144980" "f8344809d38a17bececf7603dee71d16e94a402305654a6587068e2e4dff16a3" "92e9030d8ae441b296b05fe77fda386f114497c0ac3c6e6f0d72994571a37c6d" "3813a93c0df5b1b179e32ec8a957f94b767c608328f610f6a0f5eeabd47ed1a3" "cab317d0125d7aab145bc7ee03a1e16804d5abdfa2aa8738198ac30dc5f7b569" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" "dbade2e946597b9cda3e61978b5fcc14fa3afa2d3c4391d477bdaeff8f5638c5" "801a567c87755fe65d0484cb2bded31a4c5bb24fd1fe0ed11e6c02254017acb2" "cc0dbb53a10215b696d391a90de635ba1699072745bf653b53774706999208e3" "3e335d794ed3030fefd0dbd7ff2d3555e29481fe4bbb0106ea11c660d6001767" "4780d7ce6e5491e2c1190082f7fe0f812707fc77455616ab6f8b38e796cbffa9" "630024becb5673348927e7cd480daf257725ad5e5898fe2717d041c400b0b939" "bf76c06f117e7fdfa7b70acccc0484844afe4bef53769279a17654246aba826f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
  '(deft-directory "/home/duartedias/org/")
  '(desktop-environment-mode t nil (desktop-environment))
  '(display-battery-mode nil)
- '(evil-want-Y-yank-to-eol nil)
+ '(evil-want-Y-yank-to-eol t)
  '(exwm-workspace-show-all-buffers t)
  '(fancy-battery-mode t)
  '(flycheck-display-errors-delay 0.4)
  '(flycheck-display-errors-function (quote flycheck-pos-tip-error-messages))
  '(helm-completion-style (quote emacs))
  '(ivy-initial-inputs-alist nil)
+ '(ivy-posframe-display-functions-alist (quote ((t . ivy-posframe-display-at-frame-center))))
+ '(ivy-posframe-parameters
+   (quote
+    ((parent-frame nil)
+     (left-fringe . 8)
+     (right-fringe . 8))))
+ '(lsp-keymap-prefix nil)
  '(ocp-indent-path "~/.opam/4.06.1/bin/ocp-indent")
  '(org-agenda-files (quote ("~/org/gtd.org")))
  '(org-capture-templates
@@ -407,7 +432,12 @@ This function is called at the very end of Spacemacs initialization."
  '(org-superstar-headline-bullets-list (quote (9673 9675 10040)))
  '(package-selected-packages
    (quote
-    (orgit org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain gnuplot evil-org mini-modeline quelpa-use-package quelpa zetteldeft yasnippet-snippets web-mode web-beautify utop tuareg caml tagedit slim-mode scss-mode sass-mode pug-mode prettier-js org-roam emacsql-sqlite3 emacsql ocp-indent nodejs-repl monochrome-theme minimal-theme merlin-eldoc livid-mode skewer-mode json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc impatient-mode htmlize simple-httpd helm-css-scss helm-company helm-c-yasnippet haml-mode fuzzy framemove flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-ocaml merlin exwm xelb emmet-mode dune desktop-environment deft company-web web-completion-data company auto-yasnippet yasnippet auto-dictionary ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree adaptive-wrap evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile aggressive-indent ace-window ace-link ace-jump-helm-line))))
+    (modus-themes doom-themes tao-theme which-key-posframe ivy-pos-frame godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc flycheck-golangci-lint company-go go-mode helm-gtags helm helm-core ggtags counsel-gtags company-lua lua-mode company-quickhelp lsp-ui lsp-origami origami lsp-ivy dap-mode posframe lsp-treemacs bui ccls lsp-mode markdown-mode dash-functional ivy-rtags google-c-style flycheck-ycmd flycheck-rtags disaster cpp-auto-include company-ycmd ycmd request-deferred deferred company-rtags rtags company-c-headers orgit org-rich-yank org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download org-cliplink org-brain gnuplot evil-org mini-modeline quelpa-use-package quelpa zetteldeft yasnippet-snippets web-mode web-beautify utop tuareg caml tagedit slim-mode scss-mode sass-mode pug-mode prettier-js org-roam emacsql-sqlite3 emacsql ocp-indent nodejs-repl monochrome-theme minimal-theme merlin-eldoc livid-mode skewer-mode json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc impatient-mode htmlize simple-httpd helm-css-scss helm-company helm-c-yasnippet haml-mode fuzzy framemove flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck-ocaml merlin exwm xelb emmet-mode dune desktop-environment deft company-web web-completion-data company auto-yasnippet yasnippet auto-dictionary ac-ispell auto-complete ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree adaptive-wrap evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-escape eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile aggressive-indent ace-window ace-link ace-jump-helm-line)))
+ '(which-key-posframe-parameters
+   (quote
+    ((parent-frame nil)
+     (left-fringe . 8)
+     (right-fringe . 8)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
